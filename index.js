@@ -1,6 +1,9 @@
 const TelegramBot = require('node-telegram-bot-api');
 const mysql = require('mysql');
 const axios = require('axios');
+const express = require("express");
+const app = express();
+app.use("/static", express.static(__dirname + "/photo"));
 const token = '5842583011:AAExgCjsLtA1JB3c_AnppY46Sq1jR_ow7Qo';
 const bot = new TelegramBot(token, {polling: true});
 var https = require('https'),                                                
@@ -8,9 +11,9 @@ var https = require('https'),
     fs = require('fs'); 
 var con = mysql.createConnection({
     host: "localhost",
-    database: "telegram",
+    database: "tgpost",
     user: "root",
-    password: "",
+    password: "root",
     charset: "utf8mb4_general_ci"
 });
 con.connect(function(err) {
@@ -349,3 +352,4 @@ bot.on('successful_payment', function onCallbackQuery(callbackQuery){
 Пост: ${callbackQuery.successful_payment.invoice_payload} (${amount} рублей)`)
   });
 });
+app.listen(3000);
