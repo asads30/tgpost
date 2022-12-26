@@ -59,7 +59,15 @@ bot.on('message', (msg) => {
             } else {
                 if(current_user.step == 1){
                     let text = msg.text;
-                    bot.getChatAdministrators(text).then(res => {
+                    let channel;
+                    if ( text.includes('https')) {
+                        channel = text.split('https://t.me/').join('@');
+                    } else if(text.includes('http')){
+                        channel = text.split('http://t.me/').join('@');
+                    } else {
+                        channel = text;
+                    }
+                    bot.getChatAdministrators(channel).then(res => {
                         let isAdmin = false;
                         res.forEach(admins => {
                             if(admins.user.id == user_id){
@@ -67,14 +75,14 @@ bot.on('message', (msg) => {
                             }
                         });
                         if(isAdmin === true){
-                            con.query(`UPDATE users SET step = ?, channel = ? WHERE userid = ${user_id}`, [0, text]);
+                            con.query(`UPDATE users SET step = ?, channel = ? WHERE userid = ${user_id}`, [0, channel]);
                             axios.get(`https://api.telegram.org/bot${token}/getUpdates`);
                             bot.sendMessage(chat_id, txt3);
                         } else {
                             bot.sendMessage(chat_id, '😕 Извини, но я почему–то не вижу тебя среди админов этого канала. Отправь нам канал где ты являешся администратором или создателем');
                         }
                     }).catch(e => {
-                        bot.sendMessage(chat_id, '😕 Неправильный формат канала. Отправь нам в формате: @channel');
+                        bot.sendMessage(chat_id, '😕 Неправильный формат канала. Отправь нам в формате: @channel или ссылку');
                     })
                 } else {
                     bot.sendMessage(chat_id, txt1);
@@ -125,7 +133,15 @@ bot.on('message', (msg) => {
             } else{
                 if(current_user.step == 1){
                     let text = msg.text;
-                    bot.getChatAdministrators(text).then(res => {
+                    let channel;
+                    if ( text.includes('https')) {
+                        channel = text.split('https://t.me/').join('@');
+                    } else if(text.includes('http')){
+                        channel = text.split('http://t.me/').join('@');
+                    } else {
+                        channel = text;
+                    }
+                    bot.getChatAdministrators(channel).then(res => {
                         let isAdmin = false;
                         res.forEach(admins => {
                             if(admins.user.id == user_id){
@@ -133,7 +149,7 @@ bot.on('message', (msg) => {
                             }
                         });
                         if(isAdmin === true){
-                            con.query(`UPDATE users SET step = ?, channel = ? WHERE userid = ${user_id}`, [0, text]);
+                            con.query(`UPDATE users SET step = ?, channel = ? WHERE userid = ${user_id}`, [0, channel]);
                             axios.get(`https://api.telegram.org/bot${token}/getUpdates`);
                             bot.sendMessage(chat_id, txt3);
                         } else {
@@ -204,7 +220,7 @@ bot.on('message', (msg) => {
                                 [
                                     {
                                         "text": "Вывести",
-                                        "callback_data": "go_pay"            
+                                        "callback_data": "go_payment"            
                                     }
                                 ]
                             ]
@@ -244,13 +260,13 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
             con.query(`SELECT * FROM posts WHERE id=${currentPost}`, function (err, result, fields) {
                 let post = result[0];
                 let payload = currentPost;
-                let token = '381764678:TEST:47026';
+                let token = '381764678:TEST:47448';
                 let prices = [{
                     label: post?.title,
                     amount: 100 * post?.price
                 }];
                 let options = {
-                    photo_url: 'https://wpaka.uz/photo/file_id.png',
+                    photo_url: `http://95.163.234.84:3000/static/${post?.image}.jpg`,
                     photo_width: 800,
                     photo_height: 400
                 }
@@ -278,13 +294,13 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
                 let post = result[0];
                 let channel = post.channel;
                 let payload = currentPost;
-                let token = '381764678:TEST:47026';
+                let token = '381764678:TEST:47448';
                 let prices = [{
                     label: post.title,
                     amount: 100 * post.price
                 }]
                 let options = {
-                  photo_url: 'https://wpaka.uz/photo/file_id.png',
+                  photo_url: `http://95.163.234.84:3000/static/${post?.image}.jpg`,
                   photo_width: 800,
                   photo_height: 400
                 }
@@ -315,6 +331,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
                 con.query(`UPDATE users SET step = 4 WHERE userid = ${user_id}`);
             } else if(current_user?.balance < 100){
                 bot.sendMessage(opts.chat_id, `Баланс ниже 100 рублей`);
+                console.log(current_user.balance)
             }
         } else if (data === 'go_pay'){
             text = 'Заявка на вывод принята';
