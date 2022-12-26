@@ -266,7 +266,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
                     amount: 100 * post?.price
                 }];
                 let options = {
-                    photo_url: `http://95.163.234.84:3000/static/${post?.image}.jpg`,
+                    photo_url: `http://95.163.234.84:3000/static/${post?.image}.png`,
                     photo_width: 800,
                     photo_height: 400
                 }
@@ -300,7 +300,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
                     amount: 100 * post.price
                 }]
                 let options = {
-                  photo_url: `http://95.163.234.84:3000/static/${post?.image}.jpg`,
+                  photo_url: `http://95.163.234.84:3000/static/${post?.image}.png`,
                   photo_width: 800,
                   photo_height: 400
                 }
