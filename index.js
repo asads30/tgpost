@@ -1,14 +1,22 @@
 const TelegramBot = require('node-telegram-bot-api');
 const mysql = require('mysql');
 const axios = require('axios');
+const token = '5842583011:AAExgCjsLtA1JB3c_AnppY46Sq1jR_ow7Qo';
+const bot = new TelegramBot(token, {polling: true});
+
+var https = require('https'),     
+    http = require('http'),                                           
+    Stream = require('stream').Transform,                                  
+    fs = require('fs'); 
+var privateKey  = fs.readFileSync('/etc/letsencrypt/live/telegrams.locall.ru/privkey.pem', 'utf8');
+var certificate = fs.readFileSync('/etc/letsencrypt/live/telegrams.locall.ru/cert.pem', 'utf8');
+var ca = fs.readFileSync('/etc/letsencrypt/live/telegrams.locall.ru/chain.pem', 'utf8');
+var credentials = {key: privateKey, cert: certificate, ca: ca};
+require('dotenv').config();
 const express = require("express");
 const app = express();
 app.use("/static", express.static(__dirname + "/photo"));
-const token = '5842583011:AAExgCjsLtA1JB3c_AnppY46Sq1jR_ow7Qo';
-const bot = new TelegramBot(token, {polling: true});
-var https = require('https'),                                                
-    Stream = require('stream').Transform,                                  
-    fs = require('fs'); 
+
 var con = mysql.createConnection({
     host: "localhost",
     database: "tgpost",
@@ -16,6 +24,7 @@ var con = mysql.createConnection({
     password: "root",
     charset: "utf8mb4_general_ci"
 });
+
 con.connect(function(err) {
     if (err) throw err;
 });
@@ -369,4 +378,12 @@ bot.on('successful_payment', function onCallbackQuery(callbackQuery){
 Пост: ${callbackQuery.successful_payment.invoice_payload} (${amount} рублей)`)
   });
 });
-app.listen(3000);
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+httpServer.listen(8080, () => {
+    console.log('HTTPS Server running on port 8080 (80)');
+});
+httpsServer.listen(8443, () => {
+    console.log('HTTPS Server running on port 8443 (443)');
+});
